@@ -1,0 +1,682 @@
+A题无人通过
+
+B题: 
+C/C++：
+//B 3 380 1324
+#include<bits/stdc++.h>
+#define ll long long
+using namespace std;
+map<string,int> app;
+int n,m,h,maxn;
+string s;
+bool frozen;
+void dfs(int f,int hp,int ap){
+    maxn=max(maxn,h-hp);
+    if(app["Frostbolt"]){
+        if(f>=2){
+            app["Frostbolt"]--;
+            if(frozen) dfs(f-2,hp-3-ap,ap);
+            else{
+                frozen=true;
+                dfs(f-2,hp-3-ap,ap);
+                frozen=false;
+            }
+            app["Frostbolt"]++;
+        }
+    }
+    if(app["IceLance"]){
+        if(f>=1){
+            app["IceLance"]--;
+            if(frozen) dfs(f-1,hp-4-ap,ap);
+            else{
+                frozen=true;
+                dfs(f-1,hp,ap);
+                frozen=false;
+            }
+            app["IceLance"]++;
+        }
+    }
+    if(app["Fireball"]){
+        if(f>=4){
+            app["Fireball"]--;
+            dfs(f-4,hp-6-ap,ap);
+            app["Fireball"]++;
+        }
+    }
+    if(app["BloodmageThalnos"]){
+        if(f>=2){
+            app["BloodmageThalnos"]--;
+            dfs(f-2,hp,ap+1);
+            app["BloodmageThalnos"]++;
+        }
+    }
+    if(app["CosmicAnomaly"]){
+        if(f>=4){
+            app["CosmicAnomaly"]--;
+            dfs(f-4,hp,ap+2);
+            app["CosmicAnomaly"]++;
+        }
+    }
+    if(app["hero"]){
+        if(f>=2){
+            app["hero"]--;
+            dfs(f-2,hp-1,ap);
+            app["hero"]++;
+        }
+    }
+}
+int main(){
+    scanf("%d%d%d",&n,&m,&h);
+    app["Frostbolt"]=0;
+    app["IceLance"]=0;
+    app["Fireball"]=0;
+    app["BloodmageThalnos"]=0;
+    app["CosmicAnomaly"]=0;
+    for(int i=1;i<=n;i++){
+        cin>>s;
+        app[s]++;
+    }
+    app["hero"]=1;
+    dfs(m,h,0);
+    if(maxn>=h) printf("Win");
+    else printf("Lose\n%d",maxn);
+    return 0;
+}
+
+//B 2 376 1603
+#include<bits/stdc++.h>
+using namespace std;
+    int u[7]={0,2,1,4,2,4,9};
+    int uc[7]={};
+    int c[7]={};
+    string st;
+    int ma,d,n,m,h;
+int check()
+{
+    int cc=0;
+    int dd=0;
+    if (uc[1]!=0)
+    {
+        cc=uc[1]+uc[2];
+        dd=uc[1]*3+uc[2]*4;
+    }
+    else
+    {
+        cc=uc[2]/2;
+        dd=cc*4;
+    }
+    cc+=uc[3];
+    dd+=uc[3]*6;
+    dd=dd+uc[4]*cc+uc[5]*cc*2+uc[7];
+    if (dd>=h)
+        return 31;
+    else return dd;
+}
+void work(int x,int co)
+{
+    uc[x]=0;
+    if (x==6)
+    {
+        uc[6]=0;
+        if (co+2<=m)
+        {
+            co+=2;
+            uc[7]=1;
+        }
+        d=check();
+        uc[6]=0;
+        uc[7]=0;
+        if (d>ma) ma=d;
+    }
+    else
+    {
+        for (int j=0;j<=c[x];j++)
+        {
+            co+=u[x]*j;
+            if (co>m)
+            {
+                co-=u[x]*j;
+                break;
+            }
+            uc[x]=j;
+            work(x+1,co);
+            co-=u[x]*j;
+            if (ma==31) return;
+        }
+    }
+}
+int main()
+{
+    cin >> n >> m >> h;
+    for (int i=1;i<=n;i++)
+    {
+        cin >> st;
+        switch (st[0])
+        {
+            case 'F':
+            {
+                if (st[1]=='r')
+                    c[1]++;
+                else c[3]++;
+            }break;
+            case 'I': c[2]++;
+                break;
+            case 'B': c[4]++;
+                break;
+            case 'C': c[5]++;
+                break;
+            case 'A': c[6]++;
+                break;
+        }
+    }
+    work(1,0);
+    if (ma==31)
+        cout << "Win" << endl;
+    else cout << "Lose" << endl << ma << endl;
+}
+
+//B 1 376 2376
+#include<stdio.h>
+#include<string.h>
+int card[6]={0,0,0,0,0,1},max=0;
+void dfs(int m,int md,int isfrozen,int increase)
+{
+    for(int i=0;i<=5;i++)
+    {
+        if(card[i]==0)continue;
+        if(i==0)
+        {
+            if(m<2)continue;
+            m-=2;
+            md+=3+increase;
+            card[i]--;
+            dfs(m,md,1,increase);
+            if(max<md)max=md;
+            m+=2;
+            md-=3+increase;
+            card[i]++;
+        }
+        else if(i==1)
+        {
+            if(m<1)continue;
+            m-=1;
+            if(isfrozen==1)md+=4+increase;
+            if(max<md)max=md;
+            card[i]--;
+            dfs(m,md,1,increase);
+            m+=1;
+            if(isfrozen==1)md-=4+increase;
+            card[i]++;
+        }
+        else if(i==2)
+        {
+            if(m<4)continue;
+            m-=4;
+            md+=6+increase;
+            if(max<md)max=md;
+            card[i]--;
+            dfs(m,md,isfrozen,increase);
+            m+=4;
+            md-=6+increase;
+            card[i]++;
+        }
+        else if(i==3)
+        {
+            if(m<2)continue;
+            m-=2;
+            increase+=1;
+            if(max<md)max=md;
+            card[i]--;
+            dfs(m,md,isfrozen,increase);
+            m+=2;
+            increase-=1;
+            card[i]++;
+        }
+        else if(i==4)
+        {
+            if(m<4)continue;
+            m-=4;
+            increase+=2;
+            if(max<md)max=md;
+            card[i]--;
+            dfs(m,md,isfrozen,increase);
+            m+=4;
+            increase-=2;
+            card[i]++;
+        }
+        else if(i==5)
+        {
+            if(m<2)continue;
+            m-=2;
+            md+=1;
+            if(max<md)max=md;
+            card[i]--;
+            dfs(m,md,isfrozen,increase);
+            m+=2;
+            md-=1;
+            card[i]++;
+        }
+    }
+}
+int main()
+{
+    int n,m,h;
+    scanf("%d%d%d",&n,&m,&h);
+    char a[20];
+    while(n--)
+    {
+        scanf("%s",a);
+        if(strcmp(a,"Frostbolt\0")==0)card[0]++;
+        else if(strcmp(a,"IceLance\0")==0)card[1]++;
+        else if(strcmp(a,"Fireball\0")==0)card[2]++;
+        else if(strcmp(a,"BloodmageThalnos\0")==0)card[3]++;
+        else if(strcmp(a,"CosmicAnomaly\0")==0)card[4]++;
+    }
+    dfs(m,0,0,0);
+    if(max>=h)printf("Win\n");
+    else
+    {
+        printf("Lose\n");
+        printf("%d",max);
+    }
+}
+
+//java&python:无
+
+C题：
+// C 43 3524 1978
+#include <bits/stdc++.h>
+using namespace std;
+template<typename A, typename B> ostream& operator<<(ostream &os, const pair<A, B> &p) { return os << '(' << p.first << ", " << p.second << ')'; }
+template<typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type> ostream& operator<<(ostream &os, const T_container &v) { os << '{'; string sep; for (const T &x : v) os << sep << x, sep = ", "; return os << '}'; }
+void dbg_out() { cerr << endl; }
+template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr << ' ' << H; dbg_out(T...); }
+#ifdef WA_DEBUG
+#define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
+#else
+#define dbg(...)
+#endif
+
+using ll  = long long;
+using vi  = vector<int>;
+using ull = unsigned long long;
+#define pb push_back
+#define fi first
+#define se second
+#define rep(i,a,b) for(int i=int(a);i<=(int)(b);i++)
+#define per(i,a,b) for(int i=int(a);i>=(int)(b);i--)
+const int mod  = 1e9+7;
+const int inf  = 0x3f3f3f3f;
+const int maxn = 1e5+10;
+ll h[maxn];
+int main() {
+#ifndef WA_DEBUG
+    ios::sync_with_stdio(false);cin.tie(nullptr);
+#endif
+    int n,m;
+    cin>>n>>m;
+    vector<ll> a(m+1);
+    rep(i,1,m) {
+        cin>>a[i];
+        h[i]=a[i];
+    }
+    sort(h+1,h+1+m);
+    int num=unique(h+1,h+1+m)-h;
+    vector<ll> dp(m+1);
+    ll sum=0,r=num-1,cnt=0;
+    rep(i,1,m) {
+        int id=lower_bound(h+1,h+num,a[i])-h;
+        if(id<=r) {
+            dp[id]++;
+            cnt++;
+            sum+=a[i]-1;
+        }
+        while(1) {
+            ll val=(cnt-dp[r])*(h[r]-1)-(sum-dp[r]*(h[r]-1));
+            if(val>=n) {
+                cnt-=dp[r];
+                sum-=dp[r]*(h[r]-1);
+                r--;
+            }
+            else break;
+        }
+        ll tmp=cnt*h[r]-sum;
+        ll ans=h[r];
+        if(n>tmp) {
+            ans+=(n-tmp)/cnt;
+            if((n-tmp)%cnt) ans++;
+        }
+        cout<<ans<<'\n';
+    }
+    return 0;
+}
+
+D题：
+// D 43 760 423
+#include <iostream>
+#include<cstdio>
+#include<cstring>
+#define lowbit(x) ((x) & (-x))
+using namespace std;
+    int nn,ma,x,m;
+    int a[200010]={};
+int main()
+{
+    cin >> nn;
+    for (int i=1;i<=nn;i++)
+    {
+        scanf("%d",&x);
+        a[x]++;
+        if (a[x]>m)
+        {
+            m=a[x];
+            ma=x;
+        }
+    }
+    if (m==nn)
+        cout << "-1" << endl;
+    else cout << ma << endl;
+    return 0;
+}
+
+// D 18 760 351
+#include <stdio.h>
+int a[100005];
+int main()
+{
+	int x,y,z,j;
+	z=0;
+    scanf("%d",&x);
+
+    for(int i=0;i<x;i++)
+    {
+    	scanf("%d",&y);
+    	a[y]++;
+        //printf("%d",a[y]);
+	}
+	 for(int i=0;i<=x;i++)
+	 {
+	 	if(a[i]>=z)
+	 	{
+	 		z=a[i];
+	 		j=i;
+		 }
+	 }
+    if(z==x)
+    {
+    	printf("-1");
+	}
+	else
+	{
+		printf("%d",j);
+	}
+
+    return 0;
+}
+
+E题过于简单，题解略
+
+F题：
+//F 2 256 493
+#include<stdio.h>
+unsigned long long pow(int n)
+{
+    unsigned long long res=1;
+    for(int i=0;i<n;i++)res*=2;
+    return res;
+}
+int main()
+{
+    int t;
+    scanf("%d",&t);
+    while(t--)
+    {
+        long long n;
+        scanf("%lld",&n);
+        int a[64];
+        for(int i=62;i>=0;i--)
+        {
+            a[i]=n/pow(i);
+            n%=pow(i);
+        }
+        int sum=0;
+        for(int i=0;i<63;i++)
+        {
+            sum+=a[i];
+        }
+        printf("%d\n",(sum)%2);
+    }
+}
+
+//F 2 352 317
+#include <bits/stdc++.h>
+
+using namespace std;
+int main()
+{
+    long long t,n;
+	cin>>t;
+	while(t--)
+	{
+		cin>>n;
+		long long len=0;
+		long long num=0;
+		
+		while(n)
+		{
+			if(n%2==0) num=num+1;
+			else num=num;
+			len=len+1;
+			n>>=1;
+		}
+		
+		if(len%2!=num%2) cout<<1<<endl;
+		else cout<<0<<endl;
+		
+	}
+	return 0;
+}
+
+//F 17 2788 149（python）
+def kthGrammar(K):
+    return bin(K).count('1') % 2
+ 
+t = int(input())
+for case in range(t):
+    number = int(input())
+    print(kthGrammar(number))
+
+// F 36 472 11436
+import java.util.Scanner;
+
+public class Main {
+    static int f(long n) {
+        int t = 0;
+        while (n != 0) {
+            t ^= n % 2;
+            n /= 2;
+        }
+        return t;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        long n;
+        int T = scanner.nextInt();
+        for (int t = 0; t < T; t++) {
+            n = scanner.nextLong();
+            System.out.println(f(n));
+        }
+    }
+}
+
+G题无人通过
+
+H题：
+// H 861 356 421
+#include<stdio.h>
+ 
+int f(int* nums,int i,int j){
+  return (nums[i]&nums[j]==nums[i]) || (nums[i]&nums[j]==nums[j]);
+}
+ 
+int main(){
+  double alpha,beta;
+  long long k;
+  scanf("%le %le %lld",&alpha,&beta,&k);
+  if (k == 1){
+    printf("%lf\n",alpha*1.0);
+    return 0;
+  }
+  double pre=alpha,cur=beta;
+  for(long long i=0;i<k-2; i++){
+    double n = (1+cur)/pre;
+    pre = cur;
+    cur = n;
+  }
+ 
+  printf("%.8lf\n",cur);
+}
+
+// H 1 364 302
+#include<stdio.h>
+int i,j;
+double sum[10003]={0},res=0,t=0,a[1000001];
+main()
+{
+    long long x,y,k;
+    scanf("%lld%lld%lld",&x,&y,&k);
+    double a,b;
+    a=x;
+    b=y;
+    sum[1]=a*1.;
+    sum[2]=b*1.;
+    sum[3]=(1+b)/a*1.;
+    sum[4]=(1+a+b)/(a*b)*1.;
+    sum[0]=(a*b+a+b+1)/(b+b*b)*1.;
+    printf("%.8lf",sum[k%5]);
+    return 0;
+ }
+
+//H 2 376 454
+#include<iostream>
+#include<cstdio>
+using namespace std;
+int main(){
+	double a,b;
+	long long k;
+    cin>>a>>b>>k;
+	double ans=0;
+	if(k == 1) ans = a;
+	else if(k == 2) ans = b;
+	else if(k%5 == 1) ans = a;
+	else if(k%5 == 2) ans = b;
+	else if(k%5 == 0){
+		for(int i = 3;i<=5;i++){
+			ans = (1.0 + b)/a;
+			a = b;
+			b = ans;
+		}
+	}
+	else {
+		for(int i = 3;i<=k%5;i++){
+			ans = (1.0 + b)/a;
+			a = b;
+			b = ans;
+		}
+	}
+	printf("%.8lf\n",ans);
+	return 0;
+}
+
+I题：
+//I 28 3224 1298
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+long long int n,a[99999],end[99999][2];
+
+int main(void)
+{
+    scanf("%lld",&n);
+    for(long long int i=1;i<=n;i++)
+    {
+        scanf("%lld",&a[i]);
+        long long int k=i,flag=1,temp=a[k],t=0;
+        while(k>1)
+        {
+            if(a[k-1]<=temp)
+            {
+                //k--;
+                if(end[k-1][1]==0)
+                    k=end[k-1][0];
+                else if(end[k-1][1]!=0&&a[end[k-1][1]]<=temp)
+                {
+                    k=end[k-1][0];
+                }else if(end[k-1][1]!=0&&a[end[k-1][1]]>temp&&flag==1)
+                {
+                    t=end[k-1][1];
+                    k=end[k-1][0];
+                    flag=0;
+                }
+                else if(end[k-1][1]!=0&&a[end[k-1][1]]>temp&&flag==0)
+                    k=end[k-1][1]+1;
+            }
+            else
+            {
+                if(flag==1)
+                {
+                    k--;
+                    flag=0;
+                    t=k;
+                }
+                else
+                    break;
+            }
+        }
+        end[i][0]=k;
+        end[i][1]=t;
+    }
+
+    /*for(int i=1;i<=n;i++)
+        printf("%d\n",end[i][1]);*/
+
+    for(int i=1;i<=n;i++)
+        printf("%lld\n",end[i][0]);
+    return 0;
+}
+
+J题:
+//J 1 376 274
+#include<stdio.h>
+#define N 100009
+int main()
+{
+    int a[5]={7,5,10,2,9};
+    int n;
+    scanf("%d",&n);
+    if(n>=4){
+    for(int i=0;i<n;i++)printf("%d ",a[i%5]);
+    }
+    else if(n==1)printf("1 ");
+    else if(n==2)printf("1 2 ");
+    else if(n==3)printf("10 2 9 ");
+}
+
+//J 2 376 185
+#include<bits/stdc++.h>
+using namespace std;
+int main()
+{
+	int n;
+	scanf("%d",&n);
+	for(int i=1;i<=n;i++)
+	{
+		if(i==(n+1)/2)
+			printf("2 ");
+		else
+			printf("1 ");
+	}
+    return 0;
+}
+
